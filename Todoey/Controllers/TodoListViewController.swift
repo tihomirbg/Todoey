@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
     
     var itemArray = [Item]()
     
@@ -23,8 +23,8 @@ class TodoListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+//        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        tableView.rowHeight = 80.0
     
     }
     
@@ -35,8 +35,7 @@ class TodoListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         let item = itemArray[indexPath.row]
         
@@ -52,9 +51,6 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
-    
-//        context.delete(itemArray[indexPath.row])
-//        itemArray.remove(at: indexPath.row)
         
         saveItems()
         
@@ -125,6 +121,18 @@ class TodoListViewController: UITableViewController {
         
         tableView.reloadData()
 
+    }
+    
+    //MARK: - Delete data from Swipe
+    
+    override func updateModel(at indexPath: IndexPath) {
+        self.context.delete(self.itemArray[indexPath.row])
+        self.itemArray.remove(at: indexPath.row)
+        do {
+            try self.context.save()
+        } catch {
+            print("Error, \(error)")
+        }
     }
     
 }

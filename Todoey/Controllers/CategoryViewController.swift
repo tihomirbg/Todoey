@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class CategoryViewController: UITableViewController {
+class CategoryViewController: SwipeTableViewController{
 
     var categories = [Category]()
     
@@ -19,6 +19,8 @@ class CategoryViewController: UITableViewController {
         super.viewDidLoad()
         
         loadCategories()
+        
+        tableView.rowHeight = 80.0
     }
     
     //MARK: - TableView Datasource Methods
@@ -29,7 +31,7 @@ class CategoryViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
 
         cell.textLabel?.text = categories[indexPath.row].name
         
@@ -75,6 +77,18 @@ class CategoryViewController: UITableViewController {
 
     }
     
+    //MARK: - Delete data from Swipe
+    
+    override func updateModel(at indexPath: IndexPath) {
+        self.context.delete(self.categories[indexPath.row])
+        self.categories.remove(at: indexPath.row)
+        do {
+            try self.context.save()
+        } catch {
+            print("Error, \(error)")
+        }
+    }
+    
     //MARK: - Add New Categories
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
@@ -104,3 +118,6 @@ class CategoryViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
 }
+
+
+
